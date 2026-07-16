@@ -15,14 +15,15 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-// OpenAI Model Names
+// Gemini Model Names
 const AI_MODELS = {
-  GPT_4O: "gpt-4o",
-  GPT_4O_MINI: "gpt-4o-mini",
-  DEFAULT: "gpt-4o-mini",
+  GEMINI_2_FLASH: "gemini-2.0-flash",
+  GEMINI_1_5_FLASH: "gemini-1.5-flash",
+  GEMINI_1_5_PRO: "gemini-1.5-pro",
+  DEFAULT: "gemini-2.0-flash",
 };
 
-// OpenAI Configuration
+// Gemini AI Configuration
 const AI_CONFIG = {
   DEFAULT_TEMPERATURE: 0.7,
   MAX_RETRIES: 3,

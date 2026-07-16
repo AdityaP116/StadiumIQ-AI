@@ -10,8 +10,9 @@
 |---|---|
 | Runtime | Node.js v20+ |
 | Framework | Express.js v5 |
-| Database | MongoDB (Mongoose) |
-| AI | OpenAI API (gpt-4o-mini) |
+| Database | Firebase Firestore |
+| Auth | Firebase Authentication |
+| AI | Google Gemini API (gemini-2.0-flash) |
 | Real-time | Socket.io |
 | Security | Helmet, express-rate-limit, CORS |
 
@@ -25,7 +26,7 @@ npm install
 
 # 2. Configure environment
 cp .env.example .env
-# Edit .env — add MONGO_URI (Atlas) and OPENAI_API_KEY
+# Edit .env — add GEMINI_API_KEY and Firebase Service Account credentials
 
 # 3. Start development server
 npm run dev
@@ -42,8 +43,10 @@ curl http://localhost:3000/health
 |---|---|---|
 | `PORT` | No | Server port (default: 3000) |
 | `NODE_ENV` | No | `development` or `production` |
-| `MONGO_URI` | **Yes** | MongoDB Atlas connection string |
-| `OPENAI_API_KEY` | **Yes** | OpenAI API key (sk-...) |
+| `FIREBASE_PROJECT_ID` | **Yes** | Firebase project ID |
+| `FIREBASE_CLIENT_EMAIL` | **Yes** | Firebase service account email |
+| `FIREBASE_PRIVATE_KEY` | **Yes** | Firebase private key (with \n) |
+| `GEMINI_API_KEY` | **Yes** | Google Gemini API key |
 | `CLIENT_URL` | No | Frontend URL for CORS (default: *) |
 
 ---
@@ -141,6 +144,13 @@ curl http://localhost:3000/health
 |---|---|---|
 | GET | `/api/live/status` | Simulated live stadium metrics |
 
+### User Profile (Protected)
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/users/profile` | Get authenticated user profile |
+| PUT | `/api/users/profile` | Update user profile |
+*(Requires `Authorization: Bearer <Firebase_ID_Token>`)*
+
 ---
 
 ## Socket.io
@@ -171,20 +181,20 @@ backend/
 └── src/
     ├── app.js                # Express app — middleware + routes
     ├── config/
-    │   └── db.js             # MongoDB connection
+    │   └── firebase.js       # Firebase Admin initialization
     ├── constants/
     │   └── index.js          # Centralized constants
-    ├── controllers/          # Thin controllers (10 files)
+    ├── controllers/          # Thin controllers
     ├── middleware/
+    │   ├── auth.middleware.js# Firebase JWT token verifier
     │   ├── errorHandler.js   # AppError class + global error handler
     │   ├── validate.js       # Validation middleware factory
     │   └── rateLimiter.js    # General + AI rate limiters
-    ├── models/               # 6 Mongoose models
-    ├── prompts/              # 9 AI prompt builders
-    ├── routes/               # 11 route files
+    ├── prompts/              # AI prompt builders
+    ├── routes/               # API route definitions
     ├── services/
-    │   ├── openai.service.js # Single OpenAI client (lazy-init, retry)
-    │   └── *.service.js      # 9 feature services
+    │   ├── openai.service.js # Single Gemini AI client (lazy-init, retry)
+    │   └── *.service.js      # Feature business logic + Firestore operations
     ├── socket/
     │   └── socket.js         # Socket.io broadcaster
     ├── utils/
@@ -194,7 +204,7 @@ backend/
     │   ├── responseHandler.js
     │   ├── seatData.js
     │   └── stadiumData.js
-    └── validators/           # 5 request validators
+    └── validators/           # Request input validators
 ```
 
 ---
@@ -216,7 +226,7 @@ backend/
 ## Architecture
 
 ```
-Routes → Controllers → Services → OpenAI / MongoDB
+Routes → Controllers → Services → Gemini API / Firestore
               ↓
          Validators
               ↓
@@ -224,7 +234,7 @@ Routes → Controllers → Services → OpenAI / MongoDB
 ```
 
 - **Routes**: Register path + middleware chain
-- **Controllers**: Validate input → call service → send response (thin, ~10 lines)
-- **Services**: All business logic, DB writes, AI calls
+- **Controllers**: Validate input → call service → send response (thin)
+- **Services**: All business logic, Firestore writes, AI calls
 - **Prompts**: Centralized prompt engineering (never in controllers)
-- **OpenAI Service**: Single lazy client, retry logic, JSON mode support
+- **AI Service**: Single lazy client, exponential backoff, JSON mode support

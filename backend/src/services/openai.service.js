@@ -1,35 +1,38 @@
 /**
- * StadiumIQ — OpenAI Service
- * The single, reusable OpenAI client for the entire application.
- * All AI features must use this service — never create a second OpenAI instance.
+ * StadiumIQ — Gemini AI Service
+ * The single, reusable Gemini AI client for the entire application.
+ * All AI features must use this service — never create a second Gemini instance.
  *
  * Features:
  *   - Configurable model, temperature, system/user prompts
- *   - JSON mode support
+ *   - JSON mode support (responseMimeType: application/json)
  *   - Exponential backoff retry logic
  *   - Centralized error handling and logging
+ *
+ * NOTE: Keeps the same callAI / parseAIJson interface as the former OpenAI service
+ * so no other files in the project needed to change.
  */
 
-const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const logger = require("../utils/logger");
 const { AI_MODELS, AI_CONFIG } = require("../constants");
 const { AppError } = require("../middleware/errorHandler");
 
-// Lazy-initialized OpenAI client — created on first use, not at module load.
-// This allows the server to start even without OPENAI_API_KEY set.
-let _openai = null;
+// Lazy-initialized Gemini client — created on first use, not at module load.
+// This allows the server to start even without GEMINI_API_KEY set.
+let _genAI = null;
 
-const getOpenAIClient = () => {
-  if (!_openai) {
-    if (!process.env.OPENAI_API_KEY) {
+const getGeminiClient = () => {
+  if (!_genAI) {
+    if (!process.env.GEMINI_API_KEY) {
       throw new AppError(
-        "OPENAI_API_KEY is not configured. Please add it to your .env file.",
+        "GEMINI_API_KEY is not configured. Please add it to your .env file.",
         503
       );
     }
-    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    _genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   }
-  return _openai;
+  return _genAI;
 };
 
 /**
@@ -40,15 +43,15 @@ const getOpenAIClient = () => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Call the OpenAI Chat Completions API with retry logic.
+ * Call the Gemini API with retry logic.
  *
  * @param {object} options
  * @param {string} options.systemPrompt - System-level instructions for the AI
- * @param {string} options.userPrompt - User message / context to analyze
- * @param {string} [options.model] - OpenAI model ID (default: gpt-4o-mini)
- * @param {number} [options.temperature] - Sampling temperature 0–2 (default: 0.7)
- * @param {boolean} [options.jsonMode] - If true, forces JSON output from the model
- * @param {number} [options.maxTokens] - Maximum response tokens
+ * @param {string} options.userPrompt   - User message / context to analyze
+ * @param {string} [options.model]      - Gemini model ID (default: gemini-2.0-flash)
+ * @param {number} [options.temperature]- Sampling temperature 0–2 (default: 0.7)
+ * @param {boolean} [options.jsonMode]  - If true, forces JSON output from the model
+ * @param {number} [options.maxTokens]  - Maximum response tokens
  *
  * @returns {Promise<string>} The AI's text response
  * @throws {AppError} If all retries are exhausted or the API returns an error
@@ -65,53 +68,55 @@ const callAI = async ({
 
   for (let attempt = 1; attempt <= AI_CONFIG.MAX_RETRIES; attempt++) {
     try {
-      logger.debug(`[OpenAI] Attempt ${attempt} — model: ${model}`);
+      logger.debug(`[Gemini] Attempt ${attempt} — model: ${model}`);
 
-      const requestParams = {
-        model,
+      const genAI = getGeminiClient();
+
+      const generationConfig = {
         temperature,
-        max_tokens: maxTokens,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
+        maxOutputTokens: maxTokens,
       };
 
-      // Enable JSON mode — model must be instructed to return JSON in the system prompt
+      // Enable JSON mode — instructs Gemini to return valid JSON
       if (jsonMode) {
-        requestParams.response_format = { type: "json_object" };
+        generationConfig.responseMimeType = "application/json";
       }
 
-      const response = await getOpenAIClient().chat.completions.create(requestParams);
+      const geminiModel = genAI.getGenerativeModel({
+        model,
+        systemInstruction: systemPrompt,
+        generationConfig,
+      });
 
-      const content = response.choices[0]?.message?.content;
+      const result = await geminiModel.generateContent(userPrompt);
+      const content = result.response.text();
 
       if (!content) {
-        throw new Error("OpenAI returned an empty response.");
+        throw new Error("Gemini returned an empty response.");
       }
 
-      logger.debug(`[OpenAI] Success — tokens used: ${response.usage?.total_tokens}`);
+      logger.debug(`[Gemini] Success — response received`);
 
       return content.trim();
     } catch (error) {
       lastError = error;
-      logger.warn(`[OpenAI] Attempt ${attempt} failed: ${error.message}`);
+      logger.warn(`[Gemini] Attempt ${attempt} failed: ${error.message}`);
 
       // Do not retry on authentication or bad request errors
-      if (error.status === 401 || error.status === 400) {
+      if (error.status === 401 || error.status === 400 || error.status === 403) {
         break;
       }
 
       if (attempt < AI_CONFIG.MAX_RETRIES) {
         // Exponential backoff: 1s → 2s → 4s
         const delay = AI_CONFIG.RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-        logger.info(`[OpenAI] Retrying in ${delay}ms...`);
+        logger.info(`[Gemini] Retrying in ${delay}ms...`);
         await sleep(delay);
       }
     }
   }
 
-  logger.error(`[OpenAI] All ${AI_CONFIG.MAX_RETRIES} attempts failed.`, {
+  logger.error(`[Gemini] All ${AI_CONFIG.MAX_RETRIES} attempts failed.`, {
     error: lastError?.message,
   });
 
