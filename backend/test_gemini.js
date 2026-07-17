@@ -6,7 +6,7 @@ async function run() {
     console.log("Calling Gemini API...");
     const res = await callAI({
       systemPrompt: "You are a helpful assistant.",
-      userPrompt: "Say hello!",
+      userPrompt: "Say hello!"
     });
     console.log("Response:", res);
   } catch (err) {

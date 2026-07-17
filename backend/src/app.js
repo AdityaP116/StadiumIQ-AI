@@ -24,6 +24,7 @@ const transportRoutes = require("./routes/transport.routes");
 const sustainabilityRoutes = require("./routes/sustainability.routes");
 const liveRoutes = require("./routes/live.routes");
 const userRoutes = require("./routes/userRoutes");
+const debugRoutes = require("./routes/debug.routes");
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use("/api/transport", transportRoutes);
 app.use("/api/sustainability", sustainabilityRoutes);
 app.use("/api/live", liveRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/debug", debugRoutes);
 
 // ─── 404 Handler (must be after all routes) ────────────────────────────────
 app.use(notFoundHandler);

@@ -21,15 +21,30 @@ const generateInsight = async (inputData = {}) => {
 
   const { systemPrompt, userPrompt } = buildDashboardPrompt(liveData);
 
-  const aiResponse = await callAI({
-    systemPrompt,
-    userPrompt,
-    jsonMode: true,
-    temperature: 0.5,
-    maxTokens: 2000,
-  });
-
-  const insight = parseAIJson(aiResponse);
+  let insight;
+  try {
+    const aiResponse = await callAI({
+      systemPrompt,
+      userPrompt,
+      jsonMode: true,
+      temperature: 0.5,
+      maxTokens: 2000,
+    });
+    insight = parseAIJson(aiResponse);
+  } catch (error) {
+    logger.warn(`[DashboardService] AI generation failed, falling back to static insight: ${error.message}`);
+    // Fallback static insight when API key is rate limited / out of quota
+    insight = {
+      executiveSummary: "Stadium operations are proceeding normally. (AI Insight currently unavailable due to API rate limits).",
+      alerts: [
+        { type: "System", message: "AI Insights are temporarily disabled due to API quota limits.", priority: "Medium" }
+      ],
+      recommendations: [
+        "Monitor live summary data",
+        "Check API key billing and quota limits"
+      ]
+    };
+  }
 
   return {
     insight,

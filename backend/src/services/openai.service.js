@@ -1,39 +1,18 @@
 /**
- * StadiumIQ — Gemini AI Service
- * The single, reusable Gemini AI client for the entire application.
- * All AI features must use this service — never create a second Gemini instance.
+ * StadiumIQ — NVIDIA NIM AI Service
+ * The single, reusable AI client for the entire application.
+ * Replaces the previous Gemini implementation while maintaining the same interface.
  *
  * Features:
  *   - Configurable model, temperature, system/user prompts
- *   - JSON mode support (responseMimeType: application/json)
+ *   - JSON mode support (using response_format: { type: "json_object" })
  *   - Exponential backoff retry logic
  *   - Centralized error handling and logging
- *
- * NOTE: Keeps the same callAI / parseAIJson interface as the former OpenAI service
- * so no other files in the project needed to change.
  */
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 const logger = require("../utils/logger");
 const { AI_MODELS, AI_CONFIG } = require("../constants");
 const { AppError } = require("../middleware/errorHandler");
-
-// Lazy-initialized Gemini client — created on first use, not at module load.
-// This allows the server to start even without GEMINI_API_KEY set.
-let _genAI = null;
-
-const getGeminiClient = () => {
-  if (!_genAI) {
-    if (!process.env.GEMINI_API_KEY) {
-      throw new AppError(
-        "GEMINI_API_KEY is not configured. Please add it to your .env file.",
-        503
-      );
-    }
-    _genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  }
-  return _genAI;
-};
 
 /**
  * Sleep for a given number of milliseconds.
@@ -43,12 +22,12 @@ const getGeminiClient = () => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Call the Gemini API with retry logic.
+ * Call the NVIDIA NIM API with retry logic.
  *
  * @param {object} options
  * @param {string} options.systemPrompt - System-level instructions for the AI
  * @param {string} options.userPrompt   - User message / context to analyze
- * @param {string} [options.model]      - Gemini model ID (default: gemini-2.0-flash)
+ * @param {string} [options.model]      - AI model ID (default: meta/llama-3.1-70b-instruct)
  * @param {number} [options.temperature]- Sampling temperature 0–2 (default: 0.7)
  * @param {boolean} [options.jsonMode]  - If true, forces JSON output from the model
  * @param {number} [options.maxTokens]  - Maximum response tokens
@@ -66,41 +45,63 @@ const callAI = async ({
 }) => {
   let lastError;
 
+  if (!process.env.NVIDIA_API_KEY) {
+    throw new AppError(
+      "NVIDIA_API_KEY is not configured. Please add it to your .env file.",
+      503
+    );
+  }
+
   for (let attempt = 1; attempt <= AI_CONFIG.MAX_RETRIES; attempt++) {
     try {
-      logger.debug(`[Gemini] Attempt ${attempt} — model: ${model}`);
+      logger.debug(`[NVIDIA AI] Attempt ${attempt} — model: ${model}`);
 
-      const genAI = getGeminiClient();
-
-      const generationConfig = {
+      const body = {
+        model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
         temperature,
-        maxOutputTokens: maxTokens,
+        max_tokens: maxTokens,
       };
 
-      // Enable JSON mode — instructs Gemini to return valid JSON
+      // In NVIDIA API (OpenAI-compatible), JSON mode is usually requested this way:
+      // Note: Llama 3 on NIM usually supports this, but it requires the prompt to also explicitly ask for JSON.
+      // (The system prompts already ask for JSON).
       if (jsonMode) {
-        generationConfig.responseMimeType = "application/json";
+         body.response_format = { type: "json_object" };
       }
 
-      const geminiModel = genAI.getGenerativeModel({
-        model,
-        systemInstruction: systemPrompt,
-        generationConfig,
+      const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NVIDIA_API_KEY}`,
+        },
+        body: JSON.stringify(body)
       });
 
-      const result = await geminiModel.generateContent(userPrompt);
-      const content = result.response.text();
-
-      if (!content) {
-        throw new Error("Gemini returned an empty response.");
+      if (!response.ok) {
+        const errText = await response.text();
+        const error = new Error(`NVIDIA API Error: ${response.status} - ${errText}`);
+        error.status = response.status;
+        throw error;
       }
 
-      logger.debug(`[Gemini] Success — response received`);
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
+
+      if (!content) {
+        throw new Error("NVIDIA API returned an empty response.");
+      }
+
+      logger.debug(`[NVIDIA AI] Success — response received`);
 
       return content.trim();
     } catch (error) {
       lastError = error;
-      logger.warn(`[Gemini] Attempt ${attempt} failed: ${error.message}`);
+      logger.warn(`[NVIDIA AI] Attempt ${attempt} failed: ${error.message}`);
 
       // Do not retry on authentication or bad request errors
       if (error.status === 401 || error.status === 400 || error.status === 403) {
@@ -110,13 +111,13 @@ const callAI = async ({
       if (attempt < AI_CONFIG.MAX_RETRIES) {
         // Exponential backoff: 1s → 2s → 4s
         const delay = AI_CONFIG.RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-        logger.info(`[Gemini] Retrying in ${delay}ms...`);
+        logger.info(`[NVIDIA AI] Retrying in ${delay}ms...`);
         await sleep(delay);
       }
     }
   }
 
-  logger.error(`[Gemini] All ${AI_CONFIG.MAX_RETRIES} attempts failed.`, {
+  logger.error(`[NVIDIA AI] All ${AI_CONFIG.MAX_RETRIES} attempts failed.`, {
     error: lastError?.message,
   });
 
@@ -128,7 +129,7 @@ const callAI = async ({
 
 /**
  * Parse JSON from an AI response string.
- * Use when jsonMode was enabled and you need a JavaScript object.
+ * Strips any Markdown formatting (e.g., ```json ... ```) that Llama models sometimes return.
  *
  * @param {string} content - Raw string response from callAI
  * @returns {object} Parsed JSON object
@@ -136,9 +137,15 @@ const callAI = async ({
  */
 const parseAIJson = (content) => {
   try {
-    return JSON.parse(content);
-  } catch {
-    throw new AppError("AI returned invalid JSON. Please retry.", 500);
+    // Strip markdown wrappers if they exist
+    let cleaned = content.trim();
+    if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    }
+    return JSON.parse(cleaned);
+  } catch (error) {
+    logger.error(`[NVIDIA AI] JSON parsing failed: ${error.message}`, { rawContent: content });
+    throw new AppError("AI returned invalid data format. Please retry.", 500);
   }
 };
 

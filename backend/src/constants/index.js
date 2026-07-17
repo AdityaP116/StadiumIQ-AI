@@ -15,12 +15,10 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-// Gemini Model Names
+// NVIDIA Model Names
 const AI_MODELS = {
-  GEMINI_2_FLASH: "gemini-2.0-flash",
-  GEMINI_1_5_FLASH: "gemini-1.5-flash",
-  GEMINI_1_5_PRO: "gemini-1.5-pro",
-  DEFAULT: "gemini-2.0-flash",
+  LLAMA_3_1_70B: "meta/llama-3.1-70b-instruct",
+  DEFAULT: "meta/llama-3.1-70b-instruct",
 };
 
 // Gemini AI Configuration
