@@ -15,15 +15,14 @@ services:
         value: "10000"
       - key: CLIENT_URL
         value: "https://stadiumiq-frontend.onrender.com"
-      # These need to be populated in the Render dashboard:
       - key: FIREBASE_PROJECT_ID
-        sync: false
+        value: "stadiumiq-ai"
       - key: FIREBASE_CLIENT_EMAIL
-        sync: false
+        value: "firebase-adminsdk-fbsvc@stadiumiq-ai.iam.gserviceaccount.com"
       - key: FIREBASE_PRIVATE_KEY
-        sync: false
+        value: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDWh+PvwWUSl02J\nfC1q5SfK8RSy53OxVf5a/kXaP8ipFUgTPYP9Kdvd/77HmBZjq4STIQJskxkdevXa\nPhGk/wuFtkY4H9M4e5IOuPUZTYhaVXor+4gh3iruZASJGI45Vypp/RV9tXub4oWa\nlSd2RqcN9MJZAglWRE0zyBUFhbp7+2pMNOLYH/A9PPIm/prQ968HCU74jnxDAe23\nTZA0s6l1yhsCuPVLV28w72wiizHHEsTYs+xaaPX/N6BrFtcWdmn0URAHU1/zKerC\nj+2utnmGLxwCvL8c35OsZa+CUYy+wEziHHBBfHSGOVJtV8OJaGTk3t9DVoerYCZn\nsrQ5//CnAgMBAAECggEAC14ilZ6byaQERqGymNm/Yhv5rKT+venurBeRwatdBfAz\nB80U2BzmcCs3YAyEHzPSjFGGhWn+r4ic9pD0ay0yl0Xd1h/XXu85Vu0nTXf+kGX0\nkoLXw8ep1GEESEl3wvUUo8d2jXVzlLtvnCpMKKDndndbKM97+0kzIr2TYc+WF4WO\ng8e3JFRMO9FJZZ8MGlMd/mr/fvjYK3bq55yN932gea6Bn7mdR5zP0d10lIItVz89\nFiTpLUGMT3dGOGfjkm6fmaFwl/96PXuNvb3IMJdubV/MjoL2YMosdzEzkkkHvNEb\nyk+6A2q6PlnTBD1hVUT7YDsuB6AsYCUa87goYWMI5QKBgQD4znN+ViTu+sZM2rFH\nNAQPdvqJr1f7vh6HrSIc/SxyFmriLKlUmZg9E2cYNYiL5JBBckZkmFfY1ZZPC8EG\nHkIVBCEvBsnS9jGDPQmmecWHP4UeuGDY1dc7jtdzNjEh0ZUDQjo/xezRJcgcYzlt\n9doip87G3s/2UaaL+6+tYjVC5QKBgQDcu79AmqS1wZ7PWSt7ZJ+gpTo7v3iwlaoy\nAm2lh5+YPTBdR9J5hXkK0sAizMj6td9HRZEEmCd7dE2/4+EUCGVC6Xe1ScY9TGuL\n9hXNg0gUNnANeinN7ZS3TohX4YULWMRRJk1G3Jee38rNykyUEL7cTOM07GFIdzBV\nlCaqc4ewmwKBgQDgrh6hoc0seg2E7aBVemWISZsppsw/K4qKXxCFOSNfy1qt8ELh\ngOp3jQP2WrF6EucqErX6tY/u4cIgk661hbGLJPWKcAjllylTKFWEnkaAQh5GhZ3/\ncewxfmaVRgTMU2TLUo0jderLW+D/saL056Ua0orqD9+gwk8x7hDQ8/TA+QKBgQCP\n/6M7ACensxJpbmChdPl2EZQ12ilf+aM4UME7FYkWBgUBNZOnV12po+dYTIRomjF5\nC3cZqjFHpo36Oy1gpkF5L1m62NAMuUgH3JhIo/ZnyUO8Zw/SmcVE+GSWADeNOXGJ\nBxWuvsXjDVf+fJUMmwgIK9ilc/fbEHZlveqjlA7XNQKBgHWXKR2YGN8m6zWrG7Cb\n7dA9SYF7LU6HHZKsnHZE7Za8f1y/unTGYV+G/4pWbe/2Z+Tu0/wuawHjPFhvQBWc\n24nSwITMRn6STo6LifrPZ8Fm7hLBJkz8+g2fuqrN1iDswjs+/2gItpUuvfAjSyYb\nRExxVVkwGYgO5mc45qpmzn8K\n-----END PRIVATE KEY-----\n"
       - key: NVIDIA_API_KEY
-        sync: false
+        value: "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"
 
   - type: web
     name: stadiumiq-frontend
@@ -37,21 +36,20 @@ services:
         value: "20.x"
       - key: VITE_API_BASE_URL
         value: "https://stadiumiq-backend.onrender.com"
-      # These need to be populated in the Render dashboard:
       - key: VITE_FIREBASE_API_KEY
-        sync: false
+        value: "AIzaSyBxfb8h7tlPh7ZYO-0uSuQgzxzNlcyWLx4"
       - key: VITE_FIREBASE_AUTH_DOMAIN
-        sync: false
+        value: "stadiumiq-ai.firebaseapp.com"
       - key: VITE_FIREBASE_PROJECT_ID
-        sync: false
+        value: "stadiumiq-ai"
       - key: VITE_FIREBASE_STORAGE_BUCKET
-        sync: false
+        value: "stadiumiq-ai.firebasestorage.app"
       - key: VITE_FIREBASE_MESSAGING_SENDER_ID
-        sync: false
+        value: "878393942215"
       - key: VITE_FIREBASE_APP_ID
-        sync: false
+        value: "1:878393942215:web:981a147ddcca17b479dee2"
       - key: VITE_FIREBASE_MEASUREMENT_ID
-        sync: false
+        value: "G-SW69W47LEG"
     routes:
       - type: rewrite
         source: /*
