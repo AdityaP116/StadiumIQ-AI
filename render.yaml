@@ -27,7 +27,6 @@ services:
   - type: web
     name: stadiumiq-frontend
     env: static
-    region: ohio
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
