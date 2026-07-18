@@ -15,13 +15,13 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-// NVIDIA Model Names
+// AI Model Names
 const AI_MODELS = {
-  LLAMA_3_1_70B: "meta/llama-3.1-70b-instruct",
-  DEFAULT: "meta/llama-3.1-70b-instruct",
+  GPT_OSS_20B: "openai/gpt-oss-20b",
+  DEFAULT: "openai/gpt-oss-20b",
 };
 
-// Gemini AI Configuration
+// AI Configuration
 const AI_CONFIG = {
   DEFAULT_TEMPERATURE: 0.7,
   MAX_RETRIES: 3,

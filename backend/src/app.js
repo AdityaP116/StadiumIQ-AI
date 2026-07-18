@@ -52,6 +52,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// ─── Root Route ───────────────────────────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Welcome to StadiumIQ API. The server is running successfully.",
+    endpoints: "Access API endpoints via /api or check health at /health"
+  });
+});
+
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", (req, res) => {
   res.status(200).json({

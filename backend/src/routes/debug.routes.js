@@ -11,15 +11,15 @@ const router = express.Router();
 
 /**
  * @route   GET /api/debug/genai
- * @desc    Diagnose NVIDIA GenAI Integration
+ * @desc    Diagnose OpenAI GenAI Integration
  * @access  Public (Development Only)
  */
 router.get("/genai", async (req, res) => {
   const diagnostic = {
     envLoaded: false,
     reachable: false,
-    modelConfigured: true, // Assuming constants are loaded if this file runs
-    sdkInitialized: true,  // Fetch is built-in
+    modelConfigured: true,
+    sdkInitialized: true,
     testPromptSuccess: false,
     responseLatencyMs: 0,
     errorDetails: null,
