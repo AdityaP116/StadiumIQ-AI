@@ -11,6 +11,8 @@ const helmet = require("helmet");
 const { generalLimiter } = require("./middleware/rateLimiter");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 const logger = require("./utils/logger");
+const compression = require("compression");
+const hpp = require("hpp");
 
 // Route imports
 const aiRoutes = require("./routes/ai.routes");
@@ -28,8 +30,10 @@ const debugRoutes = require("./routes/debug.routes");
 
 const app = express();
 
-// ─── Security Middleware ──────────────────────────────────────────────────────
+// ─── Security & Efficiency Middleware ───────────────────────────────────────────
 app.use(helmet());
+app.use(hpp()); // Protect against HTTP Parameter Pollution
+app.use(compression()); // Gzip compression for faster responses
 
 app.use(
   cors({

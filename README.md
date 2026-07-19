@@ -9,9 +9,19 @@
 
 **StadiumIQ** is a comprehensive, GenAI-enabled stadium operations platform originally designed for large-scale sporting events like the FIFA World Cup. 
 
-**The Problem It Solves:** Managing a stadium with 80,000+ fans involves thousands of moving parts—from crowd bottlenecks and medical emergencies to transport logistics and accessibility routing. Traditional systems are siloed and reactive.
+### Your Chosen Vertical
+This project focuses on the **Stadium Operations & Smart Infrastructure** vertical. It targets the immense operational complexity of managing 80,000+ fans in real-time, focusing specifically on crowd control, emergency response, and fan assistance.
 
-**What It Does:** StadiumIQ centralizes live operational data (occupancy, weather, security, medical incidents) and uses advanced Generative AI to provide real-time, actionable intelligence. It acts as an executive analyst, an emergency responder, and a dynamic fan assistant all in one.
+### Approach and Logic
+Managing a stadium involves thousands of moving parts—from crowd bottlenecks and medical emergencies to transport logistics and accessibility routing. Traditional systems are siloed and reactive. Our logic focuses on aggregating live operational data (occupancy, weather, security, medical incidents) and feeding it dynamically as real-time context into advanced Generative AI to provide actionable intelligence.
+
+### How the Solution Works
+StadiumIQ centralizes live data and uses a custom React frontend connected to a Node.js Express backend. The backend strictly ensures that live operational data is collected *before* being injected into AI prompts to prevent hallucinations. The platform acts as an executive analyst (dashboard), an emergency responder (auto-generating protocols), and a dynamic fan assistant all in one, using real-time Socket.io updates to keep the frontend completely in sync.
+
+### Any Assumptions Made
+- We assume the stadium is heavily instrumented with IoT devices (turnstiles, cameras, sensors) capable of streaming data to our backend.
+- We assume users (fans) have mobile connectivity to access the AI assistant.
+- We assume AI outputs in emergency situations are treated as "suggestions" requiring a final human-in-the-loop signoff.
 
 **Who It Is Built For:** 
 - Stadium Operations Directors & Security Personnel
