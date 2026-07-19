@@ -65,12 +65,12 @@ const EmergencyPage = () => {
                   className="w-full bg-surface-950 border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 outline-none focus:border-red-500 transition-colors"
                   {...register('emergencyType', { required: true })}
                 >
-                  <option value="Medical Emergency">Medical Emergency</option>
-                  <option value="Fire / Smoke">Fire / Smoke</option>
-                  <option value="Crowd Surge">Crowd Surge</option>
-                  <option value="Suspicious Package">Suspicious Package</option>
-                  <option value="Structural Failure">Structural Failure</option>
-                  <option value="Active Threat">Active Threat</option>
+                  <option value="medical">Medical Emergency</option>
+                  <option value="fire">Fire / Smoke</option>
+                  <option value="crowd_crush">Crowd Surge</option>
+                  <option value="security">Suspicious Package</option>
+                  <option value="structural">Structural Failure</option>
+                  <option value="security">Active Threat</option>
                 </select>
               </div>
 
