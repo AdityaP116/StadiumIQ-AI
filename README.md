@@ -1,6 +1,10 @@
 <div align="center">
   <h1>🏟️ StadiumIQ</h1>
   <p>AI-Powered Stadium Operations Platform built for modern, large-scale events.</p>
+  <p>
+    <strong>Live Frontend:</strong> <a href="https://stadium-iq-ai-phi.vercel.app/">https://stadium-iq-ai-phi.vercel.app/</a><br/>
+    <strong>Live Backend API:</strong> <a href="https://stadiumiq-ai-pr54.onrender.com">https://stadiumiq-ai-pr54.onrender.com</a>
+  </p>
 </div>
 
 ---
@@ -154,8 +158,8 @@ Follow these steps to run the project locally.
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/stadiumiq-ai.git
-cd stadiumiq-ai
+git clone https://github.com/AdityaP116/StadiumIQ-AI.git
+cd StadiumIQ-AI
 ```
 
 ### 2. Install Dependencies
@@ -293,7 +297,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 17. Author
 
-**Your Name**  
-- GitHub: [@yourusername](https://github.com/yourusername)  
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)  
-- Portfolio: [yourwebsite.com](https://yourwebsite.com)
+**AdityaP116**  
+- GitHub: [@AdityaP116](https://github.com/AdityaP116)  
