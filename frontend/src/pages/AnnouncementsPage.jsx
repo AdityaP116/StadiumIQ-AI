@@ -31,9 +31,10 @@ const AnnouncementsPage = () => {
   });
 
   const onSubmit = (data) => {
+    const langMap = { English: 'en', Arabic: 'ar', Spanish: 'es', French: 'fr' };
     const selectedLanguages = Object.entries(data.languages)
       .filter(([, isSelected]) => isSelected)
-      .map(([lang]) => lang);
+      .map(([lang]) => langMap[lang] || lang);
     
     announcementMutation.mutate({
       type: data.type,
@@ -71,9 +72,9 @@ const AnnouncementsPage = () => {
                   className="w-full bg-surface-950 border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary-500 transition-colors"
                   {...register('type', { required: true })}
                 >
-                  <option value="Emergency">Emergency / Evacuation</option>
-                  <option value="Operational">Operational / Crowd Control</option>
-                  <option value="Informational">Informational / General</option>
+                  <option value="emergency">Emergency / Evacuation</option>
+                  <option value="crowd_control">Operational / Crowd Control</option>
+                  <option value="general">Informational / General</option>
                 </select>
               </div>
 
