@@ -31,7 +31,10 @@ Announcement standards:
 Output must be structured JSON with keys:
 - type: string (the announcement type)
 - zone: string (target zone)
-- announcements: object with language codes as keys (e.g., "en", "ar") and the announcement text as values
+- announcements: array of objects, where each object MUST have:
+    - language: string (full language name, e.g., "English", "Arabic")
+    - script: string (the translated announcement text)
+    - phoneticPronunciation: string (optional, phonetic pronunciation for non-English scripts to assist the announcer)
 - urgencyLevel: string (LOW / MEDIUM / HIGH / CRITICAL)
 - recommendedRepetitions: number (how many times to repeat on PA system)
 - notes: string (any operational notes for the announcer)`;

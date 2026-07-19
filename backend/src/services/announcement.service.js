@@ -48,7 +48,7 @@ const generateAnnouncement = async ({
   
   const finalType = announcementData.type || type;
   const finalZone = announcementData.zone || zone;
-  const finalAnnouncements = announcementData.announcements || {};
+  const finalAnnouncements = announcementData.announcements || [];
   const finalUrgencyLevel = announcementData.urgencyLevel || "LOW";
   const finalRecommendedRepetitions = announcementData.recommendedRepetitions || 1;
 
