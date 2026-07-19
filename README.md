@@ -1,10 +1,6 @@
 <div align="center">
   <h1>🏟️ StadiumIQ</h1>
   <p>AI-Powered Stadium Operations Platform built for modern, large-scale events.</p>
-  <p>
-    <strong>Live Frontend:</strong> <a href="https://stadium-iq-ai-phi.vercel.app/">https://stadium-iq-ai-phi.vercel.app/</a><br/>
-    <strong>Live Backend API:</strong> <a href="https://stadiumiq-ai-pr54.onrender.com">https://stadiumiq-ai-pr54.onrender.com</a>
-  </p>
 </div>
 
 ---
